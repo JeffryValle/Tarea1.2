@@ -6,5 +6,21 @@
         "descripcion": "Camiseta de algodón 100% con diseño moderno.",
         "disponible": true,
         "fecha_ingreso": "2023-01-15T10:00:00Z"
+    },
+    {
+        "id": 2,
+        "nombre": "Pantalones",
+        "precio": 299.99,
+        "descripcion": "Pantalones de mezclilla con ajuste cómodo.",
+        "disponible": true,
+        "fecha_ingreso": "2023-02-20T10:00:00Z"
+    },
+    {
+        "id": 3,
+        "nombre": "Zapatillas",
+        "precio": 499.99,
+        "descripcion": "Zapatillas deportivas ligeras y transpirables.",
+        "disponible": false,
+        "fecha_ingreso": "2023-03-05T10:00:00Z"
     }
 ]
