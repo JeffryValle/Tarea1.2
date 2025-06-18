@@ -1,0 +1,10 @@
+[
+    {
+        "id": 1,
+        "nombre": "Camiseta",
+        "precio": 199.99,
+        "descripcion": "Camiseta de algodón 100% con diseño moderno.",
+        "disponible": true,
+        "fecha_ingreso": "2023-01-15T10:00:00Z"
+    }
+]

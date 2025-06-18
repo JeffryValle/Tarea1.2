@@ -1,0 +1,1 @@
+import productos from './local_db/productos.json' with { type: 'json' }; 
