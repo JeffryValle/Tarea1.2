@@ -75,6 +75,20 @@ app.put('/productos/:id', (req, res) => {
     console.log(`Producto actualizado: ${JSON.stringify(producto)}`);
 });
 
+app.delete('/productos/:id', (req, res) => {
+    const { id } = req.params;
+    
+    if ( isNaN(id) ) { return res.status(400).json({ error: 'El id debe ser un número' }); }
+
+    const producto = productos.find( product => product.id === parseInt(id));
+
+    if ( !producto ) { return res.status(404).json({ error: 'Producto no encontrado' }); }
+
+    productos.splice(productos.indexOf(producto), 1);
+
+    res.status(200).json(  { message: 'Producto eliminado exitosamente', producto  } );
+    console.log(`Producto eliminado: ${JSON.stringify(producto)}`);
+});
 
 
 app.listen( port, () => console.log(`Servidor escuchando en el puerto ${ port }`) );
