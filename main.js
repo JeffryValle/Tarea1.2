@@ -10,6 +10,17 @@ app.get('/productos', (req, res) => {
     res.status(200).json(productos);
 });
 
+app.get('/productos/disponibles', (req, res) => {
+
+    const productosDisponibles = productos.filter(producto => producto.disponible === true);
+
+    if ( productosDisponibles.length === 0 ) {
+        return res.status(404).json({ error: 'No hay productos disponibles' });
+    }
+
+    return res.status(200).json( productosDisponibles );
+})
+
 app.get('/productos/:id', (req, res) => {
     const { id } = req.params;
     
