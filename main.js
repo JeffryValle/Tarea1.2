@@ -26,7 +26,7 @@ app.get('/productos/:id', (req, res) => {
 });
 
 app.post('/productos', (req, res) => {
-    const { id } = req.body;
+    const { id, nombre, precio, descripcion, disponible } = req.body;
     const datos = {
         ...req.body,
         fecha_ingreso: new Date().toISOString()
@@ -36,6 +36,18 @@ app.post('/productos', (req, res) => {
     if ( existeProducto ) {
         return res.status(400).json({ error: 'El producto ya existe' });
     }
+    if ( typeof nombre !== 'string' || !nombre || nombre.length <= 4 ) {
+        return res.status(400).json({ error: 'El nombre del producto debe tener al menos 4 caracteres' });
+    }
+    if ( typeof precio !== 'number' || isNaN(precio) || precio <= 0 ) {
+        return res.status(400).json({ error: 'El precio del producto debe ser un número mayor a 0' });
+    }
+    if ( typeof descripcion !== 'string' || descripcion.length <= 10 || descripcion.length > 200 ) {
+        return res.status(400).json({ error: 'La descripción del producto debe tener entre 10 y 200 caracteres' });
+    }
+    if ( typeof disponible !== 'boolean' ) {
+        return res.status(400).json({ error: 'El campo "disponible" debe ser un true o false' });
+    }
 
     productos.push( datos );
     res
@@ -44,6 +56,23 @@ app.post('/productos', (req, res) => {
         message: 'Producto creado exitosamente', 
         producto: { datos } 
     });
+});
+
+app.put('/productos/:id', (req, res) => {
+    const { id } = req.params
+    const parsedId = Number(id)
+
+    if ( isNaN(parsedId) ) { return res.status(400).json({ message: 'El id no existe'}) }
+
+    const data = req.body 
+    const index = productos.findIndex((producto) => producto.id == parsedId)
+    if (index === -1) { res.status(400).json({ message: 'El producto no existe' }) }
+
+    const producto = { id: parsedId, ...data }
+    productos[index] = producto
+
+    res.json({ message: 'Producto actualizado exitosamente', producto })
+    console.log(`Producto actualizado: ${JSON.stringify(producto)}`);
 });
 
 
