@@ -25,6 +25,27 @@ app.get('/productos/:id', (req, res) => {
     res.status(200).json(producto);
 });
 
+app.post('/productos', (req, res) => {
+    const { id } = req.body;
+    const datos = {
+        ...req.body,
+        fecha_ingreso: new Date().toISOString()
+    }
+
+    const existeProducto = productos.find(product => product.id === id);
+    if ( existeProducto ) {
+        return res.status(400).json({ error: 'El producto ya existe' });
+    }
+
+    productos.push( datos );
+    res
+    .status(201)
+    .json({ 
+        message: 'Producto creado exitosamente', 
+        producto: { datos } 
+    });
+});
+
 
 
 app.listen( port, () => console.log(`Servidor escuchando en el puerto ${ port }`) );
