@@ -16,7 +16,7 @@ npm install express --save
 ## 🔑 Ejecutar proyecto de Node.js
 Para empezar a ejecutar el proyecto de Node.js puedes incorporar en el archivo ```package.json```
 dentro del campo ```"scripts"``` la siguiente clave: ```"dev":``` con el siguiente valor ```"node --watch <nombre_archivo_principal>"```.
-```ruby
+```js
 // Archivo package.json
 {
   "name": "<nombre_directorio>",
@@ -36,14 +36,23 @@ dentro del campo ```"scripts"``` la siguiente clave: ```"dev":``` con el siguien
 }
 ```
 De esta forma ya puedes empezar a ejecutar el proyecto por medio del siguiente comando: 
-```ruby
+```js
 npm run dev
 ```
+## 🔥 Rutas
+```js
+
+app.get('/productos', ()=>{})               : Retorna un listado con todos los productos.
+app.get('/productos/:id', ()=>{})           : Retorna la información del producto con el ID especificado.
+app.post('/productos', ()=>{})              : Permite agregar un nuevo producto.
+app.put('/productos/:id', ()=>{})           : Permite modificar los datos de un producto existente.
+app.delete('/productos/:id', ()=>{})        : Elimina un producto con base en su ID.
+app.get('/productos/disponibles', ()=>{})   : Devuelve únicamente los productos que están marcados como disponibles (disponible: true).
+```
+
 ## 🔭 Repositorio
 ```
 git clone https://github.com/JeffryValle/Tarea1.2.git
 ```
-
-
 
 
