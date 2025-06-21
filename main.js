@@ -6,36 +6,34 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+//? Obtener todos los productos
 app.get('/productos', (req, res) => {
     res.status(200).json(productos);
 });
 
+//? Obtener los productos que esten disponibles
 app.get('/productos/disponibles', (req, res) => {
-
     const productosDisponibles = productos.filter(producto => producto.disponible === true);
 
-    if ( productosDisponibles.length === 0 ) {
-        return res.status(404).json({ error: 'No hay productos disponibles' });
-    }
+    if ( productosDisponibles.length === 0 ) { return res.status(404).json({ error: 'No hay productos disponibles' }); }
 
     return res.status(200).json( productosDisponibles );
 })
 
+//? Obtener un producto por su id
 app.get('/productos/:id', (req, res) => {
     const { id } = req.params;
     
-    if ( isNaN(id) ) {
-        return res.status(400).json({ error: 'El id debe ser un número' });
-    }
+    if ( isNaN(id) ) { return res.status(400).json({ error: 'El id debe ser un número' }); }
 
     const producto = productos.find( product => product.id === parseInt(id));
-    if ( !producto ) {
-        return res.status(404).json({ error: 'Producto no encontrado' });
-    }
+
+    if ( !producto ) { return res.status(404).json({ error: 'Producto no encontrado' }); }
 
     res.status(200).json(producto);
 });
 
+//? Crear un producto
 app.post('/productos', (req, res) => {
     const { id, nombre, precio, descripcion, disponible } = req.body;
     const datos = {
@@ -69,6 +67,7 @@ app.post('/productos', (req, res) => {
     });
 });
 
+//? Actualizar un producto
 app.put('/productos/:id', (req, res) => {
     const { id } = req.params
     const parsedId = Number(id)
@@ -86,6 +85,7 @@ app.put('/productos/:id', (req, res) => {
     console.log(`Producto actualizado: ${JSON.stringify(producto)}`);
 });
 
+//? Eliminar un producto
 app.delete('/productos/:id', (req, res) => {
     const { id } = req.params;
     
