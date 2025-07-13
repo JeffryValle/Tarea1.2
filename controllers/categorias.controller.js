@@ -1,10 +1,12 @@
-import { no } from "zod/locales";
 import { 
+    existeCategoriaById,
+    existeCategoriaByName,
     modelActualizarCategoria, 
     modelCrearCategoria, 
     modelEliminarCategoria, 
     modelGetAllCategorias, 
-    modelGetCategoriaById 
+    modelGetCategoriaById, 
+    productoByCategoria
 } from "../models/categoria.model.js";
 
 
@@ -52,20 +54,19 @@ export const crearCategoria = async (req, res) => {
     const { nombre } = req.body;
 
     try {
-        const nuevaCategoria = await modelCrearCategoria( nombre );
+        const existe = await existeCategoriaByName( nombre );
 
-        if (!nuevaCategoria 
-            || nuevaCategoria.toLowerCase().trim() === nombre.toLowerCase().trim()
-        ) {
-            res.status(400).json({
-                message: 'Ya existe una categoria con el nombre ' + nombre,
-            });
-            return
+        if ( existe ) {
+            return res.status(400).json({
+                message: 'Ya existe una categoria con ese nombre, debe agregar otro nombre',
+            }); 
         }
+        
+        const nuevaCategoria = await modelCrearCategoria( nombre );
 
         res.status(201).json({
             message: 'Categoria creada correctamente',
-            categoria: nuevaCategoria // Deberías devolver la categoría creada
+            categoria: nuevaCategoria 
         });
 
         return
@@ -80,15 +81,24 @@ export const crearCategoria = async (req, res) => {
 
 export const actualizarCategoria = async (req, res) => {
 
-    const { categoria } = req.body;
+    const { id } = req.params;
+    const { nombre } = req.body;
 
     try {
+
+        const existe = await existeCategoriaById( id );
+
+        if (!existe) {
+            return res.status(404).json({   
+                message: 'No existe una categoria con ese id ',
+            });
+        }
         
-        const renewCategoria = await modelActualizarCategoria( categoria ); // Simulación de actualización
+        await modelActualizarCategoria( id, nombre ); 
 
         res.status(200).json({
             message: 'Categoria actualizada correctamente',
-            categoria: updatedCategoria // Deberías devolver la categoría actualizada
+            id, nombre, 
         });
 
         return
@@ -106,7 +116,15 @@ export const eliminarCategoria = async (req, res) => {
 
     try {
 
-        const result = await modelEliminarCategoria( id );
+        const existeProducto = await productoByCategoria( id );
+
+        if ( existeProducto ) {
+            return res.status(400).json({
+                message: 'No se puede eliminar la categoria porque tiene producto(s) asociados',
+            }); 
+        }
+
+        await modelEliminarCategoria( id );
 
         res.status(200).json({
             message: 'Categoria eliminada correctamente',

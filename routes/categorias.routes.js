@@ -11,6 +11,6 @@ export const categoriasRouter = Router();
 
 categoriasRouter.get('/', getCategorias);
 categoriasRouter.get('/:id', getCategoriaById);
-categoriasRouter.post('/', crearCategoria);
+categoriasRouter.post('/', crearCategoria); 
 categoriasRouter.put('/:id', actualizarCategoria);
 categoriasRouter.delete('/:id', eliminarCategoria);

@@ -1,19 +1,41 @@
 import productos from '../local_db/productos.json' with { type: 'json' };
+import { getAllProductos } from '../models/producto.model';
 
 //? Obtener todos los productos
-export const getProductos = (req, res) => {
-    res.status(200).json(productos); 
+export const getProductos = async (req, res) => {
+    
+    try {
+        
+        const productos = await getAllProductos();
+
+        if ( productos.length === 0 ) {
+            return res.status(404).json({ error: 'No hay productos disponibles' });
+        }
+
+        res.status(200).json(productos);
+
+    } catch (error) {
+        res.status(400).json({ error: 'Error al obtener los productos' });
+    }
+
 }
 
 //? Obtener los productos que esten disponibles
-export const getProductosDisponibles = (req, res) => {
-    const productosDisponibles = productos.filter( producto => producto.disponible === true);
+export const getProductosDisponibles = async (req, res) => {
+    
+    try {
 
-    if ( productosDisponibles.length === 0 ) { 
-        return res.status(404).json({ error: 'No hay productos disponibles' }); 
+        const productos = await getProductosDisponibles();
+
+        if ( productos.length === 0 ) {
+            return res.status(200).json({ message: 'No hay productos disponibles' });
+        }
+
+        res.status(200).json(productos);
+    } catch (error) {
+        res.status(400).json({ error: 'Error al obtener los productos disponibles' });
     }
 
-    return res.status(200).json( productosDisponibles );
 }
 
 

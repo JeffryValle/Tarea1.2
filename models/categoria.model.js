@@ -22,12 +22,6 @@ export const modelCrearCategoria = async ( nombre ) => {
     try {
         await cnx.beginTransaction();
 
-        const existe = await existeCategoria( nombre );
-
-        if ( existe ) {
-            return
-        }
-
         const query = 'INSERT INTO categorias (nombre) VALUES (?);';
         await cnx.execute(query, [ nombre ]);
 
@@ -43,18 +37,16 @@ export const modelCrearCategoria = async ( nombre ) => {
 
 }
 
-export const modelActualizarCategoria = async ( categoria ) => {
+export const modelActualizarCategoria = async ( id, nombre ) => {
     
     const cnx = await pool.getConnection();
     try {
-        const { id, nombre } = categoria
         await cnx.beginTransaction();
-
         const query = 'UPDATE categorias SET nombre = ? WHERE id = ?;';
-        await cnx.execute(query, [nombre, id]);
+        await cnx.execute(query, [ nombre, id ]);
 
         await cnx.commit();
-        return categoria;
+        return
     } catch (error) {
         await cnx.rollback();
         throw error;
@@ -85,10 +77,26 @@ export const modelEliminarCategoria = async ( id ) => {
 
 }
 
-export const existeCategoria = async ( nombre ) => {
+export const existeCategoriaByName = async ( nombre ) => {
 
     const query = 'SELECT nombre FROM categorias WHERE nombre = ?;';
 
     const [ rows ] = await pool.query(query, [ nombre ]);
     return rows[0];
 }
+
+export const existeCategoriaById = async ( id ) => {
+
+    const query = 'SELECT nombre FROM categorias WHERE id = ?;';
+
+    const [ rows ] = await pool.query(query, [ id ]);
+    return rows[0];
+}
+
+export const productoByCategoria = async ( id ) => {
+    
+    const query = 'SELECT * FROM productos WHERE categoria_id = ?;';
+
+    const [ rows ] = await pool.query(query, [ id ]);
+    return rows[0];
+}   
