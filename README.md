@@ -9,6 +9,23 @@ npm init -y
 ```
 npm install express --save
 ```
+
+## 🔧 Instalar dotenv 
+```
+npm install dotenv
+```
+## 🔧 Instalar zod 
+```
+npm install zod
+```
+## 🔧 Instalar driver MySQL 
+```
+npm install mysql2
+```
+## 🔧 Instalar CORS 
+```
+npm install cors
+```
 > [!TIP]
 > Por defecto con la versión npm 5.0+, ```npm install``` agrega el módulo a la lista de dependencias
 > en el archivo ```package.json```; con nuevas versiones de npm, debes especificar la opción ```--save```
@@ -42,12 +59,18 @@ npm run dev
 ## 🔥 Rutas
 ```js
 
-app.get('/productos', ()=>{})               : Retorna un listado con todos los productos.
-app.get('/productos/:id', ()=>{})           : Retorna la información del producto con el ID especificado.
-app.post('/productos', ()=>{})              : Permite agregar un nuevo producto.
-app.put('/productos/:id', ()=>{})           : Permite modificar los datos de un producto existente.
-app.delete('/productos/:id', ()=>{})        : Elimina un producto con base en su ID.
-app.get('/productos/disponibles', ()=>{})   : Devuelve únicamente los productos que están marcados como disponibles (disponible: true).
+productosRouter.get('/productos', ()=>{})               : Retorna un listado con todos los productos.
+productosRouter.get('/productos/:id', ()=>{})           : Retorna la información del producto con el ID especificado.
+productosRouter.post('/productos', ()=>{})              : Permite agregar un nuevo producto.
+productosRouter.put('/productos/:id', ()=>{})           : Permite modificar los datos de un producto existente.
+productosRouter.delete('/productos/:id', ()=>{})        : Elimina un producto con base en su ID.
+productosRouter.get('/productos/disponibles', ()=>{})   : Devuelve únicamente los productos que están marcados como disponibles (disponible: true).
+
+categoriasRouter.get('/categorias', ()=>{})               : Lista todas las categorias
+categoriasRouter.get('/categorias/:id', ()=>{})           : Obtener categoria por ID
+categoriasRouter.post('/categorias', ()=>{})              : Crear una nueva categoria
+categoriasRouter.put('/categorias/:id', ()=>{})           : Permite modificar los datos de una categoria existente
+categoriasRouter.delete('/categorias/:id', ()=>{})        : Elimina una categoria con base en su ID.
 ```
 
 ## 🔭 Repositorio
