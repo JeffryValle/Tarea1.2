@@ -1,12 +1,20 @@
-import productos from '../local_db/productos.json' with { type: 'json' };
-import { getAllProductos } from '../models/producto.model';
+import { validateProducto } from '../schema/producto.schema.js';
+import { existeCategoriaById } from '../models/categoria.model.js';
+import { 
+    existeProducto, 
+    modelActualizarProducto, 
+    modelCrearProducto, 
+    modelEliminarProducto, 
+    modelGetAllProductos, 
+    modelGetProductoById 
+} from '../models/producto.model.js';
 
 //? Obtener todos los productos
 export const getProductos = async (req, res) => {
     
     try {
         
-        const productos = await getAllProductos();
+        const productos = await modelGetAllProductos();
 
         if ( productos.length === 0 ) {
             return res.status(404).json({ error: 'No hay productos disponibles' });
@@ -40,85 +48,135 @@ export const getProductosDisponibles = async (req, res) => {
 
 
 //? Obtener un producto por su id
-export const getProductoById = (req, res) => {
-    const { id } = req.params;
+export const getProductoById = async (req, res) => {
     
-    if ( isNaN(id) ) { return res.status(400).json({ error: 'El id debe ser un número' }); }
+    const { id } = req.params;
 
-    const producto = productos.find( product => product.id === parseInt(id));
+    try {
+        
+        const producto = await modelGetProductoById( id );
+        
+        if ( !producto ) {
+            res.status( 200 ).json({ message: 'Producto no existe' });
+            return
+        }
 
-    if ( !producto ) { return res.status(404).json({ error: 'Producto no encontrado' }); }
+        res.status( 200 ).json( producto );
 
-    res.status(200).json(producto);
+    } catch (error) {
+        res.status(400).json({ error: 'Error al obtener el producto' });
+    }
 }
 
 
 //? Crear un producto
-export const crearProducto = (req, res) => {
-    const { id, nombre, precio, descripcion, disponible } = req.body;
-    const datos = {
-        ...req.body,
-        fecha_ingreso: new Date().toISOString()
-    }
+export const crearProducto = async (req, res) => {
+    
+    const data = req.body;
 
-    const existeProducto = productos.find(product => product.id === id);
-    if ( existeProducto ) {
-        return res.status(400).json({ error: 'El producto ya existe' });
-    }
-    if ( typeof nombre !== 'string' || !nombre || nombre.length <= 4 ) {
-        return res.status(400).json({ error: 'El nombre del producto debe tener al menos 4 caracteres' });
-    }
-    if ( typeof precio !== 'number' || isNaN(precio) || precio <= 0 ) {
-        return res.status(400).json({ error: 'El precio del producto debe ser un número mayor a 0' });
-    }
-    if ( typeof descripcion !== 'string' || descripcion.length <= 10 || descripcion.length > 200 ) {
-        return res.status(400).json({ error: 'La descripción del producto debe tener entre 10 y 200 caracteres' });
-    }
-    if ( typeof disponible !== 'boolean' ) {
-        return res.status(400).json({ error: 'El campo "disponible" debe ser un true o false' });
-    }
+    const { success, err, data: safeData } = validateProducto( data );
 
-    productos.push( datos );
-    res
-    .status(201)
-    .json({ 
-        message: 'Producto creado exitosamente', 
-        producto: { datos } 
-    });
+    try {
+        
+        if ( !success ) {
+            res.status(400).json({ 
+                message: 'Rectificar los datos', 
+                errors: err
+            });
+            return 
+        }
+
+        const categoria = await existeCategoriaById( safeData.categoriaId );
+
+        if ( !categoria ) {
+            res.status(404).json({ message: 'La categoria no existe' });
+            return
+        }
+        const producto = await modelCrearProducto( safeData );
+
+        if ( !producto ) {
+            res.status(400).json({ message: 'Error al crear el producto' });
+            return 
+        }
+
+        res.status(201).json({
+            message: 'Producto creado exitosamente',
+            safeData,
+        })
+
+    } catch (error) {
+        
+    }
 }
 
 
 //? Actualizar un producto
-export const actualizarProducto = (req, res) => {
-    const { id } = req.params
-    const parsedId = Number(id)
+export const actualizarProducto = async (req, res) => {
+    
+    const { id } = req.params;
+    const data = req.body;
 
-    if ( isNaN(parsedId) ) { return res.status(400).json({ message: 'El id no existe'}) }
+    const { success, err, data: safeData } = validateProducto( data );
 
-    const data = req.body 
-    const index = productos.findIndex((producto) => producto.id == parsedId)
-    if (index === -1) { res.status(400).json({ message: 'El producto no existe' }) }
+    try {
 
-    const producto = { id: parsedId, ...data }
-    productos[index] = producto
+        if ( !success ) {
+            res.status(400).json({ 
+                message: 'Rectificar los datos', 
+                errors: err
+            });
+            return 
+        }
 
-    res.json({ message: 'Producto actualizado exitosamente', producto })
-    console.log(`Producto actualizado: ${JSON.stringify(producto)}`);
+        const producto = await existeProducto( id );
+        if ( !producto ) {
+            res.status(404).json({ message: 'No existe ese producto' });
+            return
+        }
+
+        const categoria = await existeCategoriaById( data.categoriaId );
+        if ( !categoria ) {
+            res.status(404).json({ message: 'La categoria no existe' });
+            return 
+        }
+        
+        await modelActualizarProducto( id, safeData );
+
+        res.status(200).json({
+            message: 'Producto actualizado exitosamente',
+            safeData,
+        });
+
+    } catch (error) {
+        res.status(400).json({ error: 'Error al actualizar el producto' });
+    }
+
 }
 
 
 //? Eliminar un producto
-export const eliminarProducto = (req, res) => {
+export const eliminarProducto = async(req, res) => {
+
     const { id } = req.params;
     
-    if ( isNaN(id) ) { return res.status(400).json({ error: 'El id debe ser un número' }); }
+    try {
 
-    const producto = productos.find( product => product.id === parseInt(id));
+        const isActive = await existeProducto( id );
 
-    if ( !producto ) { return res.status(404).json({ error: 'Producto no encontrado' }); }
+        if ( !isActive ) {
+            res.status(404).json({ message: 'No existe ese producto'});
+            return
+        }
 
-    productos.splice(productos.indexOf(producto), 1);
+        await modelEliminarProducto( id );
 
-    res.status(200).json(  { message: 'Producto eliminado exitosamente', producto  } );
-    console.log(`Producto eliminado: ${JSON.stringify(producto)}`);
+        res.status(200).json({
+            message: 'Producto eliminado exitosamente',
+        });
+
+        return
+
+    } catch (error) {
+        res.status(400).json({ error: 'Error al eliminar el producto' });
+    }
 }
